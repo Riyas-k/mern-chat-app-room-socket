@@ -26,24 +26,24 @@ const ChatRoom = () => {
     setData(location.state);
   }, [location]);
   useEffect(() => {
-   // Retrieve messages from local storage when the component mounts
-   const storedMessages = localStorage.getItem("chatMessages");
-   if (storedMessages) {
-     setMessages(JSON.parse(storedMessages));
-   }
+    // Retrieve messages from local storage when the component mounts
+    const storedMessages = localStorage.getItem("chatMessages");
+    if (storedMessages) {
+      setMessages(JSON.parse(storedMessages));
+    }
 
-   if (socket) {
-     socket.on("getNewMessage", (newMessage) => {
-       const updatedMessages = [...messages, newMessage];
-       setMessages(updatedMessages);
+    if (socket) {
+      socket.on("getNewMessage", (newMessage) => {
+        const updatedMessages = [...messages, newMessage];
+        setMessages(updatedMessages);
 
-       // Store the updated messages in local storage
-       localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
+        // Store the updated messages in local storage
+        localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
 
-       msgBoxRef.current?.scrollIntoView({ behavior: "smooth" });
-       setInputValue("");
-     });
-   }
+        msgBoxRef.current?.scrollIntoView({ behavior: "smooth" });
+        setInputValue("");
+      });
+    }
   }, [socket, messages]);
   const handleKeyDown = (e) => {
     e.keyCode === 13 ? handleSubmit() : "";
@@ -87,8 +87,8 @@ const ChatRoom = () => {
                 </div>
               </div>
             );
-        })}
-        <div ref={msgBoxRef}></div>
+          })}
+          <div ref={msgBoxRef}></div>
         </div>
 
         <div className="d-flex justify-content-center align-items-center">
@@ -97,7 +97,7 @@ const ChatRoom = () => {
             onChange={(value) => setInputValue(value)}
             onKeyDown={handleKeyDown}
             cleanOnEnter
-            placeholder="Type your message..."
+            placeholder="Write your message..."
           />
           <button className="btn btn-warning ml-2" onClick={handleSubmit}>
             <i className="bi bi-send"></i>
