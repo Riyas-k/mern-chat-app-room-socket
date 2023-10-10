@@ -15,43 +15,69 @@ const ChatRoom = () => {
   const [data, setData] = useState({});
   const msgBoxRef = useRef(null);
   useEffect(() => {
-    const socket = io.connect("http://localhost:5000/");
-    setSocket(socket);
-    socket.on("connect", () => {
-      // console.log(socket.id);
-      socket.emit("joinRoom", location.state.room);
-    });
+    try {
+      const socket = io.connect("http://localhost:5000/");
+      setSocket(socket);
+      socket.on("connect", () => {
+        // console.log(socket.id);
+        socket.emit("joinRoom", location.state.room);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
   useEffect(() => {
-    setData(location.state);
+    try {
+      setData(location.state);
+    } catch (error) {
+      console.log(error);
+    }
   }, [location]);
   useEffect(() => {
-    // Retrieve messages from local storage when the component mounts
-    const storedMessages = localStorage.getItem("chatMessages");
-    if (storedMessages) {
-      setMessages(JSON.parse(storedMessages));
-    }
+    try {
+      // Retrieve messages from local storage when the component mounts
+      const storedMessages = localStorage.getItem("chatMessages");
+      if (storedMessages) {
+        setMessages(JSON.parse(storedMessages));
+      }
+      try {
+        if (socket) {
+          socket.on("getNewMessage", (newMessage) => {
+            const updatedMessages = [...messages, newMessage];
+            setMessages(updatedMessages);
 
-    if (socket) {
-      socket.on("getNewMessage", (newMessage) => {
-        const updatedMessages = [...messages, newMessage];
-        setMessages(updatedMessages);
+            // Store the updated messages in local storage
+            localStorage.setItem(
+              "chatMessages",
+              JSON.stringify(updatedMessages)
+            );
 
-        // Store the updated messages in local storage
-        localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
-
-        msgBoxRef.current?.scrollIntoView({ behavior: "smooth" });
-        setInputValue("");
-      });
+            msgBoxRef.current?.scrollIntoView({ behavior: "smooth" });
+            setInputValue("");
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
     }
   }, [socket, messages]);
   const handleKeyDown = (e) => {
-    e.keyCode === 13 ? handleSubmit() : "";
+    try {
+      e.keyCode === 13 ? handleSubmit() : "";
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleSubmit = () => {
-    if (inputValue) {
-      const newMessage = { time: new Date(), inputValue, name: data.name };
-      socket.emit("newMessage", { newMessage, room: data.room });
+    try {
+      if (inputValue) {
+        const newMessage = { time: new Date(), inputValue, name: data.name };
+        socket.emit("newMessage", { newMessage, room: data.room });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -59,7 +85,7 @@ const ChatRoom = () => {
     <>
       <div className="py-4 m-5 w-50 shadow bg-white text-dark border rounded container">
         <div className="text-center px-3 mb-4 text-capitalize">
-          <h1 className="text-warning mb-4">{data?.room} Chat Room</h1>
+          <h1 className="text-primary mb-4">{data?.room} Chat Room</h1>
         </div>
         <div
           className="bg-light border rounded p-3 mb-4"
@@ -99,7 +125,7 @@ const ChatRoom = () => {
             cleanOnEnter
             placeholder="Write your message..."
           />
-          <button className="btn btn-warning ml-2" onClick={handleSubmit}>
+          <button className="btn btn-primary ml-2" onClick={handleSubmit}>
             <i className="bi bi-send"></i>
           </button>
         </div>

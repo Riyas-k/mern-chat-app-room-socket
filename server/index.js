@@ -14,16 +14,16 @@ const io = new Server(server, {
   },
 });
 
-app.get("/", (req, res) => {
-  res.send("hello");
-});
 io.on("connection", (socket) => {
-  // console.log(socket.id);
-  socket.on("joinRoom", (room) => socket.join(room));
+  try {
+    socket.on("joinRoom", (room) => socket.join(room));
 
-  socket.on("newMessage", ({newMessage,room})=>{
-    io.in(room).emit('getNewMessage',newMessage)
-  });
+    socket.on("newMessage", ({ newMessage, room }) => {
+      io.in(room).emit("getNewMessage", newMessage);
+    });
+  } catch (error) {
+    console.log("Socket error", error);
+  }
 });
 
 server.listen(5000, () => {
